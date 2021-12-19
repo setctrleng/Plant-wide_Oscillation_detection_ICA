@@ -1,0 +1,70 @@
+% close all
+
+%% Load data
+data - data to be analyzed
+t    - time vector for the data to be analyzed tout
+
+%% Parameters
+
+window_size = 250; % Size f wanted window
+Ts = 250 ; % time step sec
+Fs = 1/Ts; % Frequency Hz
+F_ny = 1/(2*Ts); % Nyquist frequency
+nfft = 1024; % Number of points
+
+%% Saving
+% window average
+t_out = zeros(floor(length(data)/window_size),1);
+v_out = zeros(floor(length(data)/window_size),size(data,2));
+
+%Pwelch
+p_res = zeros((nfft),size(v_out,2));
+f_res = zeros((nfft),1);
+
+%% Window average
+for i = 1:size(data,2)
+    [t_out,v_out(:,i)] = window_average(t,data(:,i),window_size);
+end
+
+%% Power spectrum
+% Defining a frequency vector for generating a logarithmic x-axis
+f_pwelch = logspace(-6,log10(F_ny),nfft);
+
+% Calculation of PS - using dtrend to remove dc parts of the signal
+for i = 1:size(v_out,2)
+    [p_res(:,i),f_res] = pwelch(detrend(v_out(:,i)),[],[],f_pwelch',Fs,'power')
+end
+
+%% Normalization
+
+% Saving
+p_nor = zeros(size(p_res,1),size(p_res,2));
+sum_p_j = zeros(size(p_res,1),1);
+
+for j = 1:size(p_res,1)
+    %Summate the absolute value of each row
+    sum_p_j(j) = sum(p_res(j,:),2);
+    
+    %Calculate the scaled y_bar
+    for i = 1:size(p_res,2)
+        p_nor(j,i) = p_res(j,i)/sum_p_j(j);
+    end
+end
+
+%% PCA
+% Generating data through PCA
+[coeff, score, latent, tsquared, explained, mu] = pca(p_nor);
+
+% Calculation of 
+[~,n_components] = max(cumsum(explained) >= 95);
+
+p_nor1 = p_nor';
+
+W = jadeR(p_nor1,n_components);
+
+
+Y = W*p_nor1;
+A = pinv(W);
+
+
+
