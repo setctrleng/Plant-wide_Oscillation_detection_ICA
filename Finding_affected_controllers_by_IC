@@ -1,0 +1,72 @@
+% This method is based on the work of C. Xia and J. Howell presented in "Isolating multiple sources of plant-wide oscillationsvia independent component analysis" in Control Engineering Practice,
+Volume 13, Issue 8, 2005, Pages 1027-1035, SSN 0967-0661, https://doi.org/10.1016/j.conengprac.2004.12.003.
+(https://www.sciencedirect.com/science/article/pii/S0967066105000043)
+
+%% Scaling independent components
+% Saving
+y_bar = zeros(size(Y,1),size(Y,2));
+sum_y_j = zeros(size(Y,1),1);
+
+for j = 1:size(Y,1)
+    %Sum the absolute value of each row
+    sum_y_j(j) = sum(abs(Y(j,:)),2);
+    
+    %Calculate the scaled y_bar
+    for i = 1:size(Y,2)
+        y_bar(j,i) = Y(j,i)/sum_y_j(j);
+    end
+end
+
+%% Calculating column scaled matrix
+%Making diag matrix
+Diag = eye(size(A,2));
+for j = 1:size(A,2)
+    Diag(j,j) = sum_y_j(j);
+end
+
+B = A*Diag;
+
+%% Sign matrix
+sign_max_abs = zeros(size(y_bar,1),1);
+max_value = zeros(size(y_bar,1),1);
+index = zeros(size(y_bar,1),1);
+
+for j = 1:size(y_bar,1)
+    
+    [max_value(j), index(j)] = max(abs(y_bar(j,:)));
+    sign_max_abs(j) = sign(y_bar(j,index(j)));  
+end
+
+%% Define constrained independent component
+C = sign_max_abs.*y_bar;
+
+%% Constrained mixing matrix A_bar
+Diag_SN = eye(size(sign_max_abs,1));
+
+for j = 1:size(Y,1)
+    Diag_SN(j,j) = sign_max_abs(j);
+end
+
+A_bar = B*Diag_SN;
+
+%% CRI
+CRI = abs(A_bar);
+
+%% CRR
+% saving matrix and initial values
+sum_cri_i = zeros(1,size(A,2));
+crr_de = 0;
+
+% CRR Numerator
+for j = 1:size(CRI,2)    
+    sum_cri_i(j) = sum(abs(CRI(:,j)));  
+end
+
+%CRR Denominator
+crr_de = sum(sum_cri_i,2);
+
+% CRR computation in %
+CRR = 100*(sum_cri_i/crr_de);
+
+
+
