@@ -1,0 +1,35 @@
+unction [time_out,values_out] = window_average(time_in,values_in,window_size)
+
+% Error message
+if (size(values_in,1) ~= size(time_in,1))
+    stop('Length of time and value must be equal')
+end
+
+% Number of data points out
+N_out = floor(size(time_in,1)/window_size);
+
+% Time start/end value
+start_time = time_in(1);
+stop_time = N_out*window_size;
+
+% Time vector out - linear spacing between the time intervals 
+time_out = linspace(start_time, stop_time-window_size,N_out);
+
+% Empty vector for values out
+values_out = zeros(N_out,1);
+
+% Windowing for-loop
+
+for i = 1:N_out
+    % Start/stop index
+    start_index = (i-1)*window_size + 1;
+    stop_index = i*window_size;
+    
+    % All data in window
+    x = values_in(start_index:stop_index);
+    
+    % i'th value in output value
+    values_out(i) =  mean(x);
+
+end % for i = 1:N_out
+end
