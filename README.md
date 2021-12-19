@@ -4,4 +4,8 @@ Code to performe Plant-Wide Oscillation Detection with ICA and find affected con
 In order to use the presented code, follow the following steps:
 
 1. Generate data set to be analyzed
-2. Run the file "
+2. Run the file "main_file"
+3. Save the A and Y matrix
+4. Run the file "Finding_affected_controllers_by_IC"
+
+
