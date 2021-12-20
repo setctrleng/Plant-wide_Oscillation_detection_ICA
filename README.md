@@ -1,5 +1,5 @@
 # Plant-wide_Oscillation_detection_ICA
-Code to performe Plant-Wide Oscillation Detection with ICA and find affected control loops. 
+Code to performe Plant-Wide Oscillation Detection with ICA and find affected control loops in MATLAB v2012b and newer.
 
 In order to use the presented code, follow the following steps:
 
